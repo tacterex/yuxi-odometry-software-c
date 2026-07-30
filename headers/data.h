@@ -4,7 +4,9 @@
 #include <cstdint>
 
 namespace hardware{
-    const uint8_t adc0_gpio = 26;
+    const uint8_t  adc0_gpio          = 26;
+    const uint16_t imu_max_value      = 0x10000 - 1;
+    const uint16_t imu_half_max_value = 0x08000;
 }
 
 namespace mechanical{

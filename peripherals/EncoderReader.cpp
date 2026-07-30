@@ -1,6 +1,7 @@
 #include "headers/peripherals.h"
 #include "headers/data.h"
 #include "hardware/adc.h"
+#include <cstdint>
 
 using namespace peripherals;
 
