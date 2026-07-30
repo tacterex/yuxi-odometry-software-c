@@ -10,10 +10,9 @@ spi_inst_t* get_spi(uint8_t i){
     return spi0;
 }
 
-IMUReader::IMUReader(uint8_t _u_spi_i, uint8_t sck, uint8_t miso, uint8_t mosi, uint8_t _u_cs_pin){
-    _spi_i = _u_spi_i;
+IMUReader::IMUReader(uint8_t _u_spi_i, uint8_t sck, uint8_t miso, uint8_t mosi, uint8_t _u_cs_pin):
+_spi_i(_u_spi_i), _cs_pin(_u_cs_pin){
     _spi = get_spi(_u_spi_i);
-    _cs_pin = _u_cs_pin;
 
     spi_init(_spi, 1000 * 1000);
     spi_set_format(

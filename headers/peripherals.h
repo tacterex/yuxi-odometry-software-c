@@ -18,6 +18,7 @@ namespace peripherals {
         int16_t  get_raw_step();
         uint16_t get_max_value();
         uint8_t  get_channel();
+        void reinit();
     };
 
     class IMUReader {

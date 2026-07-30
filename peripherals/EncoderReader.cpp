@@ -14,7 +14,7 @@ EncoderReader::EncoderReader(bool XY) {
     }
 
     _adc_channel = 1 + (uint8_t)XY;
-    _max_value   = (0b1 << 12) - 1;
+    _max_value   = hardware::encoder_max_value;
 
     adc_gpio_init(hardware::adc0_gpio + _adc_channel);
     update_last_position();
@@ -48,4 +48,8 @@ int16_t EncoderReader::get_raw_step() {
         s -= _max_value;
     
     return s;
+}
+
+void EncoderReader::reinit() {
+    update_last_position();
 }

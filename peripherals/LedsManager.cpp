@@ -1,9 +1,12 @@
 #include "headers/peripherals.h"
 #include "hardware/gpio.h"
 
+static bool leds_initialized = false;
+
 namespace peripherals {
 
     void leds_init() {
+        if (leds_initialized) return;
         gpio_init(LED_RED_GPIO);
         gpio_init(LED_GREEN_GPIO);
         gpio_init(LED_BLUE_GPIO);
@@ -15,6 +18,8 @@ namespace peripherals {
         gpio_put(LED_RED_GPIO, 1);
         gpio_put(LED_GREEN_GPIO, 1);
         gpio_put(LED_BLUE_GPIO, 1);
+
+        leds_initialized = true;
     }
     
     void leds_turn_on() {
