@@ -37,9 +37,10 @@ pico_sdk_init()
 
 add_executable(ODOMETRY_SOFTWARE_C
  #ODOMETRY_SOFTWARE_C.cpp
- tests/imu_test.cpp
+ tests/leds_test.cpp
  peripherals/EncoderReader.cpp
  peripherals/IMUReader.cpp
+ peripherals/LedsManager.cpp
 )
 
 pico_set_program_name(ODOMETRY_SOFTWARE_C "ODOMETRY_SOFTWARE_C")

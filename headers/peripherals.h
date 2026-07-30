@@ -48,6 +48,16 @@ namespace peripherals {
         void calibrate_offset_z(uint16_t n_samples);
         int16_t get_raw_gyroscope_z(bool include_offset);
     };
+
+    const uint8_t LED_RED_GPIO   = 18;
+    const uint8_t LED_GREEN_GPIO = 19;
+    const uint8_t LED_BLUE_GPIO  = 20;
+
+    void leds_init();
+    void leds_turn_on();
+    void leds_turn_blue();
+    void leds_turn_yellow();
+    void leds_turn_off();
 }
 
 #endif
