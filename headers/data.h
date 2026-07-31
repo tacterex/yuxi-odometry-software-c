@@ -29,4 +29,10 @@ namespace imu_registers{
     constexpr uint8_t FS_G_500DPS = 0b01   << 2;
 }
 
+namespace _i2c_slave_registers {
+    constexpr uint8_t ADDRESS = 0x69;
+    constexpr uint8_t SPECIAL_COMMAND = 0x33;
+    constexpr uint8_t START_READ = 0x03;
+}
+
 #endif

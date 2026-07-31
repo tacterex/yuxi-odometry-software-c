@@ -12,12 +12,13 @@ int main()
     sleep_ms(3000);
 
     double pos[3] = {0, 0, 0};
+    uint8_t pos_raw[24] = {0};
 
     peripherals::EncoderReader x(false);
     peripherals::EncoderReader y(true);
     peripherals::IMUReader imu(0, 2, 3, 4, 5);
 
-    processes::PositionCalculator calc(x, y, imu, pos);
+    processes::PositionCalculator calc(x, y, imu, pos, pos_raw);
 
     while (true) {
         calc.update_position();
