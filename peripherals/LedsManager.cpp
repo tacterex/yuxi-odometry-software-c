@@ -1,7 +1,12 @@
 #include "headers/peripherals.h"
 #include "hardware/gpio.h"
+#include "headers/data.h"
 
 static bool leds_initialized = false;
+
+using hardware::LED_RED_GPIO;
+using hardware::LED_GREEN_GPIO;
+using hardware::LED_BLUE_GPIO;
 
 namespace peripherals {
 

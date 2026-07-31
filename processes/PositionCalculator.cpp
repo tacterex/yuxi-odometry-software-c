@@ -9,10 +9,10 @@
 using namespace peripherals;
 using namespace processes;
 
-constexpr double PI = 3.14159265358979323846;
+constexpr u_float_t PI = 3.1415926f;
 
 PositionCalculator::PositionCalculator(EncoderReader& u_axis_x,
-     EncoderReader& u_axis_y, IMUReader& u_imu, double* u_pos_buffer, uint8_t* u_pos_raw_buffer):
+     EncoderReader& u_axis_y, IMUReader& u_imu, u_float_t* u_pos_buffer, uint8_t* u_pos_raw_buffer):
      _axis_x(u_axis_x), _axis_y(u_axis_y), _imu(u_imu), pos_buffer(u_pos_buffer), pos_raw_buffer(u_pos_raw_buffer) {
         reinit();
 }
@@ -41,7 +41,7 @@ void PositionCalculator::init_timer() {
 void PositionCalculator::reset() {
     pos_x = pos_y = phi = previous_time = cycle_time = 0;
     dl_to_mm = PI * mechanical::WHEEL_DIAMETER_MM / hardware::encoder_max_value;
-    dw_to_rps = 2.0 * _imu.get_sensivity() / hardware::imu_half_max_value * PI / 180;
+    dw_to_rps = 2.0f * _imu.get_sensivity() / hardware::imu_half_max_value * PI / 180;
 }
 
 void PositionCalculator::reinit() {

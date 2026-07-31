@@ -4,6 +4,7 @@
 
 #include "headers/peripherals.h"
 #include "headers/processes.h"
+#include "headers/data.h"
 
 int main()
 {
@@ -11,8 +12,8 @@ int main()
 
     sleep_ms(3000);
 
-    double pos[3] = {0, 0, 0};
-    uint8_t pos_raw[24] = {0};
+    u_float_t pos[3] = {0, 0, 0};
+    uint8_t pos_raw[3*U_FLOAT_SIZE] = {0};
 
     peripherals::EncoderReader x(false);
     peripherals::EncoderReader y(true);

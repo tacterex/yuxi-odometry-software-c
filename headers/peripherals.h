@@ -8,8 +8,8 @@ namespace peripherals {
     class EncoderReader {
     private:
         uint8_t  _adc_channel;
-        uint16_t _last_position;
-        uint16_t _max_value;
+        uint16_t last_position;
+        uint16_t max_value;
         void update_last_position();
 
     public:
@@ -49,10 +49,6 @@ namespace peripherals {
         void calibrate_offset_z(uint16_t n_samples);
         int16_t get_raw_gyroscope_z(bool include_offset);
     };
-
-    const uint8_t LED_RED_GPIO   = 18;
-    const uint8_t LED_GREEN_GPIO = 19;
-    const uint8_t LED_BLUE_GPIO  = 20;
 
     void leds_init();
     void leds_turn_on();

@@ -1,8 +1,8 @@
+#include <cstdint>
 #include "headers/peripherals.h"
 #include "headers/data.h"
 #include "hardware/spi.h"
 #include "hardware/gpio.h"
-#include <cstdint>
 
 using namespace peripherals;
 

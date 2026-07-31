@@ -14,14 +14,14 @@ EncoderReader::EncoderReader(bool XY) {
     }
 
     _adc_channel = 1 + (uint8_t)XY;
-    _max_value   = hardware::encoder_max_value;
+    max_value   = hardware::encoder_max_value;
 
     adc_gpio_init(hardware::adc0_gpio + _adc_channel);
     update_last_position();
 }
 
 uint16_t EncoderReader::get_max_value() {
-    return _max_value;
+    return max_value;
 }
 
 uint8_t EncoderReader::get_channel() {
@@ -34,18 +34,18 @@ uint16_t EncoderReader::get_raw_position() {
 }
 
 void EncoderReader::update_last_position() {
-    _last_position = get_raw_position();
+    last_position = get_raw_position();
 }
 
 int16_t EncoderReader::get_raw_step() {
-    uint16_t l = _last_position;
+    uint16_t l = last_position;
     update_last_position();
-    int16_t s = _last_position - l;
+    int16_t s = last_position - l;
 
-    if (s < -_max_value / 2)
-        s += _max_value;
-    if (s > _max_value / 2)
-        s -= _max_value;
+    if (s < -max_value / 2)
+        s += max_value;
+    if (s > max_value / 2)
+        s -= max_value;
     
     return s;
 }

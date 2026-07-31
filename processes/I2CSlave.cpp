@@ -3,6 +3,7 @@
 #include "hardware/gpio.h"
 #include "pico/i2c_slave.h"
 #include "headers/data.h"
+#include "headers/peripherals.h"
 
 using namespace processes;
 
@@ -29,17 +30,20 @@ void I2CSlave::_handle_i2c_event(i2c_inst_t* _r_i2c, i2c_slave_event_t event) {
             break;
 
         case I2C_SLAVE_REQUEST:
-            if (_current_register < sizeof(_tx_buffer) + _i2c_slave_registers::START_READ) {
+            if (_current_register < 3 * U_FLOAT_SIZE + _i2c_slave_registers::START_READ &&
+            _current_register >= _i2c_slave_registers::START_READ) {
                 i2c_write_byte_raw(_i2c, _tx_buffer[_current_register++ - _i2c_slave_registers::START_READ]);
             }
             else{
                 i2c_write_byte_raw(_i2c, 0);
-                _current_register = 0;
             }
             break;
 
         case I2C_SLAVE_FINISH:
 
+            break;
+
+        default:
             break;
     };
 }
@@ -57,6 +61,8 @@ void I2CSlave::set_current_slave_defult() {
 void I2CSlave::build() {
     _i2c = get_i2c(_i2c_i);
 
+    i2c_init(_i2c, 100 * 1000);
+
     gpio_set_function(_sda, GPIO_FUNC_I2C);
     gpio_set_function(_scl, GPIO_FUNC_I2C);
     gpio_pull_up(_sda);
@@ -67,4 +73,5 @@ void I2CSlave::build() {
         _address,
         _i2c_handler
     );
+
 }
