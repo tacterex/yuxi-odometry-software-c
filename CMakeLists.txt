@@ -38,7 +38,7 @@ pico_sdk_init()
 
 add_executable(ODOMETRY_SOFTWARE_C
  #ODOMETRY_SOFTWARE_C.cpp
- tests/slave_test.cpp
+ main.cpp
  peripherals/EncoderReader.cpp
  peripherals/IMUReader.cpp
  peripherals/LedsManager.cpp
@@ -60,6 +60,7 @@ target_link_libraries(ODOMETRY_SOFTWARE_C
         hardware_spi
         hardware_i2c
         pico_i2c_slave
+        pico_multicore
 )
 
 # Add the standard include files to the build

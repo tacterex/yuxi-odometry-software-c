@@ -14,8 +14,9 @@ i2c_inst_t* get_i2c(uint8_t i){
 I2CSlave* I2CSlave::_instance = nullptr;
 
 I2CSlave::I2CSlave(uint8_t _u_i2c_i, uint8_t _u_sda, uint8_t _u_scl, uint8_t _u_address,
-     uint8_t* _u_buffer, bool* _u_special_request_pointer):
-        _i2c_i(_u_i2c_i), _address(_u_address), _tx_buffer(_u_buffer), _sda(_u_sda), _scl(_u_scl){
+     uint8_t* _u_buffer, bool& _u_special_request_pointer):
+        _i2c_i(_u_i2c_i), _address(_u_address), _tx_buffer(_u_buffer), _sda(_u_sda), _scl(_u_scl),
+         _special_request_pointer(_u_special_request_pointer){
     _instance = this;
     _current_register = 0;
 }
@@ -25,7 +26,7 @@ void I2CSlave::_handle_i2c_event(i2c_inst_t* _r_i2c, i2c_slave_event_t event) {
         case I2C_SLAVE_RECEIVE:
             _current_register = i2c_read_byte_raw(_i2c);
             if (_current_register == _i2c_slave_registers::SPECIAL_COMMAND) {
-                *_special_request_pointer = true;
+                _special_request_pointer = true;
             }
             break;
 

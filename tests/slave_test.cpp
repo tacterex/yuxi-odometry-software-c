@@ -20,7 +20,7 @@ int main()
         test_buffer[i] = i;
     bool test_sc = false;
 
-    processes::I2CSlave slave(0, 0, 1, _i2c_slave_registers::ADDRESS, test_buffer, &test_sc);
+    processes::I2CSlave slave(0, 0, 1, _i2c_slave_registers::ADDRESS, test_buffer, test_sc);
 
     slave.build();
 
@@ -28,6 +28,6 @@ int main()
 
     uint64_t c = 0;
     while(true) {
-        c = c ^ 1;
+        printf("%d", test_sc);
     }
 }

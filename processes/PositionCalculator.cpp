@@ -89,7 +89,7 @@ void PositionCalculator::update_position() {
     pos_buffer[1] = pos_y;
     pos_buffer[2] = phi;
 
-    std::memcpy(pos_raw_buffer, pos_buffer, sizeof(pos_buffer));
+    std::memcpy(pos_raw_buffer, pos_buffer, 3 * U_FLOAT_SIZE);
 }
 
 PositionCalculator::~PositionCalculator() {
