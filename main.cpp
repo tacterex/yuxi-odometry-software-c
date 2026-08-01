@@ -21,9 +21,28 @@ struct shared_data
 u_float_t pos[3];
 
 peripherals::EncoderReader x(false), y(true);
-peripherals::IMUReader imu(0, 2, 3, 4, 5);
-processes::PositionCalculator calc(x, y, imu, pos, calc_data.buffer);
-processes::I2CSlave slave(0, 0, 1, _i2c_slave_registers::ADDRESS, slave_data.buffer, slave_data.reinit_requested);
+peripherals::IMUReader imu(
+    hardware::_spi_i,
+    hardware::_spi_scl,
+    hardware::_spi_miso, 
+    hardware::_spi_mosi,
+    hardware::_spi_cs_pin
+);
+processes::PositionCalculator calc(
+    x,
+    y,
+    imu,
+    pos,
+    calc_data.buffer
+);
+processes::I2CSlave slave(
+    hardware::_i2c_i, 
+    hardware::_i2c_sda, 
+    hardware::_i2c_scl, 
+    _i2c_slave_registers::ADDRESS, 
+    slave_data.buffer, 
+    slave_data.reinit_requested
+);
 
 mutex_t data_mutex;
 

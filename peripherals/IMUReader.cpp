@@ -10,11 +10,19 @@ spi_inst_t* get_spi(uint8_t i){
     return spi0;
 }
 
-IMUReader::IMUReader(uint8_t _u_spi_i, uint8_t sck, uint8_t miso, uint8_t mosi, uint8_t _u_cs_pin):
-_spi_i(_u_spi_i), _cs_pin(_u_cs_pin){
+IMUReader::IMUReader(
+    uint8_t _u_spi_i,
+    uint8_t sck,
+    uint8_t miso,
+    uint8_t mosi,
+    uint8_t _u_cs_pin
+):
+    _spi_i(_u_spi_i),
+    _cs_pin(_u_cs_pin)
+{
     _spi = get_spi(_u_spi_i);
 
-    spi_init(_spi, 1000 * 1000);
+    spi_init(_spi, hardware::_spi_baudrate);
     spi_set_format(
         _spi,
         8,
@@ -38,8 +46,13 @@ _spi_i(_u_spi_i), _cs_pin(_u_cs_pin){
     offset_z = 0;
 }
 
-void IMUReader::select() { gpio_put(_cs_pin, 0); }
-void IMUReader::deselect() { gpio_put(_cs_pin, 1); }
+void IMUReader::select() { 
+    gpio_put(_cs_pin, 0); 
+}
+
+void IMUReader::deselect() {
+    gpio_put(_cs_pin, 1);
+}
 
 uint8_t IMUReader::get_raw_refresh_rate() {
     return odr;

@@ -31,7 +31,7 @@ void PositionCalculator::init_imu(){
     _imu.get_who_am_i();
     _imu.enable_gyroscope();
     sleep_ms(1000);
-    _imu.calibrate_offset_z(500);
+    _imu.calibrate_offset_z(hardware::_g_cali_samples);
 }
 
 void PositionCalculator::init_timer() {

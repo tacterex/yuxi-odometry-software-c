@@ -34,7 +34,13 @@ namespace peripherals {
         void deselect();
     
     public:
-        IMUReader(uint8_t _u_spi_i, uint8_t sck, uint8_t miso, uint8_t mosi, uint8_t _u_cs_pin);
+        IMUReader(
+            uint8_t _u_spi_i,
+            uint8_t sck,
+            uint8_t miso,
+            uint8_t mosi,
+            uint8_t _u_cs_pin
+        );
         uint8_t get_raw_refresh_rate();
         uint8_t get_raw_sensivity();
         uint16_t get_refresh_rate();

@@ -37,7 +37,6 @@ pico_sdk_init()
 # Add executable. Default name is the project name, version 0.1
 
 add_executable(ODOMETRY_SOFTWARE_C
- #ODOMETRY_SOFTWARE_C.cpp
  main.cpp
  peripherals/EncoderReader.cpp
  peripherals/IMUReader.cpp

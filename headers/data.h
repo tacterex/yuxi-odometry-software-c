@@ -15,6 +15,20 @@ namespace hardware{
     constexpr uint8_t LED_RED_GPIO        = 18;
     constexpr uint8_t LED_GREEN_GPIO      = 19;
     constexpr uint8_t LED_BLUE_GPIO       = 20;
+
+    constexpr uint8_t _i2c_i              = 0;
+    constexpr uint8_t _i2c_sda            = 0;
+    constexpr uint8_t _i2c_scl            = 1;
+    constexpr uint32_t _i2c_baudrate      = 100 * 1000;
+
+    constexpr uint8_t _spi_i              = 0;
+    constexpr uint8_t _spi_scl            = 2;
+    constexpr uint8_t _spi_miso           = 3;
+    constexpr uint8_t _spi_mosi           = 4;
+    constexpr uint8_t _spi_cs_pin         = 5;
+    constexpr uint32_t _spi_baudrate      = 2000 * 1000;
+
+    constexpr uint16_t _g_cali_samples    = 1200;
 }
 
 namespace mechanical{
@@ -37,9 +51,9 @@ namespace imu_registers{
 }
 
 namespace _i2c_slave_registers {
-    constexpr uint8_t ADDRESS = 0x69;
+    constexpr uint8_t ADDRESS         = 0x69;
     constexpr uint8_t SPECIAL_COMMAND = 0x33;
-    constexpr uint8_t START_READ = 0x45;
+    constexpr uint8_t START_READ      = 0x45;
 }
 
 #endif
