@@ -51,6 +51,9 @@ namespace imu_registers{
 }
 
 namespace _i2c_slave_registers {
+    constexpr uint8_t _N_NW_REGS      = 1;
+    constexpr uint8_t _N_W_REGS       = 3;
+
     constexpr uint8_t ADDRESS         = 0x69;
     constexpr uint8_t START_READ      = 0x45;
     constexpr uint8_t RESET_NW        = 0x33;

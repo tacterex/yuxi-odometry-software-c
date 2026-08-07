@@ -30,6 +30,7 @@ namespace peripherals {
         int16_t offset_z;
         uint8_t odr;
         uint8_t dps;
+        uint32_t _baudrate;
         void select();
         void deselect();
     
@@ -39,7 +40,8 @@ namespace peripherals {
             uint8_t sck,
             uint8_t miso,
             uint8_t mosi,
-            uint8_t _u_cs_pin
+            uint8_t _u_cs_pin,
+            uint32_t _u_baudrate
         );
         uint8_t get_raw_refresh_rate();
         uint8_t get_raw_sensivity();

@@ -15,14 +15,16 @@ IMUReader::IMUReader(
     uint8_t sck,
     uint8_t miso,
     uint8_t mosi,
-    uint8_t _u_cs_pin
+    uint8_t _u_cs_pin,
+    uint32_t _u_baudrate
 ):
     _spi_i(_u_spi_i),
-    _cs_pin(_u_cs_pin)
+    _cs_pin(_u_cs_pin),
+    _baudrate(_u_baudrate)
 {
     _spi = get_spi(_u_spi_i);
 
-    spi_init(_spi, hardware::_spi_baudrate);
+    spi_init(_spi, _baudrate);
     spi_set_format(
         _spi,
         8,

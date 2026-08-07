@@ -24,7 +24,8 @@ PositionCalculator::PositionCalculator(
     pos_buffer(u_pos_buffer), 
     pos_raw_buffer(u_pos_raw_buffer)
 {
-        reinit();
+    x_enabled = y_enabled = g_enabled = true;
+    reinit();
 }
 
 void PositionCalculator::init_encoder() {
@@ -74,10 +75,34 @@ uint64_t PositionCalculator::get_cycle_time_us_64() {
     return cycle_time;
 }
 
+void PositionCalculator::enable_x() {
+    x_enabled = true;
+}
+
+void PositionCalculator::enable_y() {
+    y_enabled = true;
+}
+
+void PositionCalculator::enable_g() {
+    g_enabled = true;
+}
+
+void PositionCalculator::disable_x() {
+    x_enabled = false;
+}
+
+void PositionCalculator::disable_y() {
+    y_enabled = false;
+}
+
+void PositionCalculator::disable_g() {
+    g_enabled = false;
+}
+
 void PositionCalculator::update_position() {
-    dx_relative = _axis_x.get_raw_step()         * dl_to_mm;
-    dy_relative = _axis_y.get_raw_step()         * dl_to_mm;
-    w           = _imu.get_raw_gyroscope_z(true) * dw_to_rps;
+    dx_relative = x_enabled ? _axis_x.get_raw_step()         * dl_to_mm  : 0;
+    dy_relative = y_enabled ? _axis_y.get_raw_step()         * dl_to_mm  : 0;
+    w           = g_enabled ? _imu.get_raw_gyroscope_z(true) * dw_to_rps : 0;
 
     current_time = time_us_64();
     cycle_time = current_time - previous_time;
