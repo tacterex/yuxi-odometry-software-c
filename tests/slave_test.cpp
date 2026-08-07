@@ -18,9 +18,10 @@ int main()
     uint8_t test_buffer[U_FLOAT_SIZE * 3];
     for(uint8_t i = 0; i < U_FLOAT_SIZE * 3; ++i)
         test_buffer[i] = i;
+    bool test_w_regs[3], test_nw_regs[1];
     bool test_sc = false;
 
-    processes::I2CSlave slave(0, 0, 1, _i2c_slave_registers::ADDRESS, test_buffer, test_sc);
+    processes::I2CSlave slave(0, 0, 1, _i2c_slave_registers::ADDRESS, test_buffer, test_w_regs, test_nw_regs, test_sc);
 
     slave.build();
 

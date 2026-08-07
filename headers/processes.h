@@ -51,8 +51,12 @@ namespace processes {
         static I2CSlave* _instance;
         uint8_t* _tx_buffer;
         uint8_t _current_register;
-        bool& _special_request_pointer;
+        bool waiting_for_register;
+        bool* _w_registers;
+        bool* _nw_registers;
         uint8_t _sda, _scl;
+        uint8_t t_byte;
+        bool& _updated;
 
     public:
         I2CSlave(
@@ -61,7 +65,9 @@ namespace processes {
             uint8_t _u_scl,
             uint8_t _u_address,
             uint8_t* _u_buffer,
-            bool& _u_special_request_pointer
+            bool* _u_w_registers,
+            bool* _u_nw_registers,
+            bool& _u_updated
         );
         void set_current_slave_defult();
         void build();

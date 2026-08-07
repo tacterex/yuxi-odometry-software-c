@@ -14,7 +14,9 @@ static void core1_task();
 struct shared_data
 {
     uint8_t buffer[3 * U_FLOAT_SIZE];
-    bool reinit_requested;
+    bool w_regs[3];
+    bool nw_regs[1];
+    bool updated;
 } calc_data, slave_data, cmn_data;
 
 
@@ -41,7 +43,9 @@ processes::I2CSlave slave(
     hardware::_i2c_scl, 
     _i2c_slave_registers::ADDRESS, 
     slave_data.buffer, 
-    slave_data.reinit_requested
+    slave_data.w_regs,
+    slave_data.nw_regs,
+    slave_data.updated
 );
 
 mutex_t data_mutex;
@@ -63,18 +67,18 @@ int main()
 
         mutex_enter_blocking(&data_mutex);
 
-        if (slave_data.reinit_requested){
-            calc_data.reinit_requested = true;
-            slave_data.reinit_requested = false;
+        if (slave_data.updated){
+            calc_data.updated = true;
+            slave_data.updated = false;
         }
 
         std::memcpy(&slave_data.buffer, &calc_data.buffer, 3 * U_FLOAT_SIZE);
 
         mutex_exit(&data_mutex);
 
-        if(calc_data.reinit_requested) {
+        if(calc_data.updated) {
             calc.reinit();
-            calc_data.reinit_requested = false;
+            calc_data.updated = false;
         }
     }
 }

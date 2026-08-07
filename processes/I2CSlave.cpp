@@ -19,27 +19,59 @@ I2CSlave::I2CSlave(
     uint8_t _u_scl,
     uint8_t _u_address,
     uint8_t* _u_buffer,
-    bool& _u_special_request_pointer
+    bool* _u_w_registers,
+    bool* _u_nw_registers,
+    bool& _u_updated
 ):
     _i2c_i(_u_i2c_i),
     _address(_u_address),
     _tx_buffer(_u_buffer),
     _sda(_u_sda),
     _scl(_u_scl),
-    _special_request_pointer(_u_special_request_pointer) 
+    _w_registers(_u_w_registers) ,
+    _nw_registers(_u_nw_registers),
+    _updated(_u_updated)
 {
     _instance = this;
     _i2c = get_i2c(_i2c_i);
     _current_register = 0;
+    waiting_for_register = true;
 }
 
 void I2CSlave::_handle_i2c_event(i2c_inst_t* _r_i2c, i2c_slave_event_t event) {
     switch (event) {
         case I2C_SLAVE_RECEIVE:
-            _current_register = i2c_read_byte_raw(_i2c);
-            if (_current_register == _i2c_slave_registers::SPECIAL_COMMAND) {
-                _special_request_pointer = true;
-                _current_register = 0;
+            t_byte = i2c_read_byte_raw(_i2c);
+
+            if (
+                t_byte == _i2c_slave_registers::RESET_NW
+            )
+            {
+                _nw_registers[0] = true;
+                _updated = true;
+            }
+            else
+            {
+                if (waiting_for_register) {
+                    _current_register = t_byte;
+                    waiting_for_register = false;
+                }
+                else {
+                    switch (_current_register) {
+                        case _i2c_slave_registers::X_ENABLED:
+                            _w_registers[0] = (t_byte != 0);
+                            break;
+                        case _i2c_slave_registers::Y_ENABLED:
+                            _w_registers[1] = (t_byte != 0);
+                            break;
+                        case _i2c_slave_registers::G_ENABLED:
+                            _w_registers[2] = (t_byte != 0);
+                            break;
+                    }
+
+                    waiting_for_register = true;
+                    _updated = true;
+                }
             }
             break;
 
