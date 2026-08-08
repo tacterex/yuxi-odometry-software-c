@@ -12,6 +12,7 @@ namespace processes {
         peripherals::EncoderReader& _axis_x;
         peripherals::EncoderReader& _axis_y;
         peripherals::IMUReader& _imu;
+
         u_float_t pos_x, pos_y, phi;
         u_float_t dl_to_mm, dw_to_rps;
         u_float_t* pos_buffer;
@@ -53,20 +54,23 @@ namespace processes {
     private:
         uint8_t _i2c_i, _sda, _scl;
         i2c_inst_t* _i2c;
-        uint8_t _address;
-        uint32_t _baudrate;
+        uint8_t address;
+        uint32_t baudrate;
 
         static I2CSlave* _instance;
 
-        uint8_t* _tx_buffer;
-        uint8_t _current_register;
+        uint8_t* tx_buffer;
+        slave_reg_t current_register;
         bool waiting_for_register;
-        uint8_t* _w_registers, * _nw_registers;
-        uint8_t t_byte;
-        bool& _updated;
+        uint8_t* w_registers, * nw_registers;
+        uint8_t temp_byte;
+        bool& updated;
 
         static void _i2c_handler(i2c_inst_t* _r_i2c, i2c_slave_event_t event);
         void _handle_i2c_event(i2c_inst_t* _r_i2c, i2c_slave_event_t event);
+        void _handle_i2c_receive();
+        void _handle_i2c_request();
+        void _handle_i2c_finish();
 
     public:
         I2CSlave(

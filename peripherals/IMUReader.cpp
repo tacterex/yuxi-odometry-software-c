@@ -20,11 +20,11 @@ IMUReader::IMUReader(
 ):
     _spi_i(_u_spi_i),
     _cs_pin(_u_cs_pin),
-    _baudrate(_u_baudrate)
+    baudrate(_u_baudrate)
 {
     _spi = get_spi(_u_spi_i);
 
-    spi_init(_spi, _baudrate);
+    spi_init(_spi, baudrate);
     spi_set_format(
         _spi,
         8,
@@ -41,8 +41,8 @@ IMUReader::IMUReader(
     gpio_set_dir(_cs_pin, GPIO_OUT);
     gpio_put(_cs_pin, 1);
 
-    odr = imu_registers::ODR_G_104HZ;
-    dps = imu_registers::FS_G_500DPS;
+    odr = ODR_G_104HZ;
+    dps = FS_G_500DPS;
     gyro_enabled = false;
 
     offset_z = 0;
@@ -65,23 +65,25 @@ uint8_t IMUReader::get_raw_sensivity() {
 }
 
 uint16_t IMUReader::get_refresh_rate() {
-    if ((~odr) ^ imu_registers::ODR_G_104HZ)
-        return 104;
-    return 0;
+    switch (odr) {
+        case ODR_G_104HZ: return 104; break;
+        default:          return 0; break;
+    }
 }
 
 uint16_t IMUReader::get_sensivity() {
-    if ((~dps) ^ imu_registers::FS_G_500DPS)
-        return 500;
-    return 500;
+    switch (dps) {
+        case FS_G_500DPS: return 500; break;
+        default:          return 1; break;
+    }
 }
 
 int16_t IMUReader::get_offset_z() {
     return offset_z;
 }
 
-uint8_t IMUReader::_read_register(uint8_t reg) {
-    uint8_t tx[2] = {uint8_t(reg | imu_registers::BIT_R_MASK), 0};
+uint8_t IMUReader::_read_register(imu_reg_t reg) {
+    uint8_t tx[2] = {uint8_t(reg | BIT_R_MASK), 0};
     uint8_t rx[2];
 
     select();
@@ -91,19 +93,19 @@ uint8_t IMUReader::_read_register(uint8_t reg) {
     return rx[1];
 }
 
-void IMUReader::_write_register(uint8_t reg, uint8_t val) {
-    uint8_t tx[2] = {uint8_t(reg & imu_registers::BIT_W_MASK), val};
+void IMUReader::_write_register(imu_reg_t reg, uint8_t val) {
+    uint8_t tx[2] = {uint8_t(reg & BIT_W_MASK), val};
 
     select();
     spi_write_blocking(_spi, tx, 2);
     deselect();
 }
 
-void IMUReader::_read_registers(uint8_t reg, uint8_t* buffer, uint8_t n_bytes) {
+void IMUReader::_read_registers(imu_reg_t reg, uint8_t* buffer, uint8_t n_bytes) {
     uint8_t tx[n_bytes + 1];
     uint8_t rx[n_bytes + 1];
 
-    tx[0] = reg | imu_registers::BIT_R_MASK;
+    tx[0] = reg | BIT_R_MASK;
     for(uint8_t i = 0; i < n_bytes; ++i){
         tx[i + 1] = 0x00;
     }
@@ -118,11 +120,11 @@ void IMUReader::_read_registers(uint8_t reg, uint8_t* buffer, uint8_t n_bytes) {
 }
 
 uint8_t IMUReader::get_who_am_i() {
-    return _read_register(imu_registers::WHO_AM_I);
+    return _read_register(WHO_AM_I);
 }
 
 void IMUReader::enable_gyroscope() {
-    _write_register(imu_registers::CTRL2_G, odr | dps);
+    _write_register(CTRL2_G, odr | dps);
     gyro_enabled = true;
 }
 
@@ -139,7 +141,7 @@ void IMUReader::calibrate_offset_z(uint16_t n_samples) {
 int16_t IMUReader::get_raw_gyroscope_z(bool include_offset) {
     uint8_t reg_readings[2];
 
-    _read_registers(imu_registers::OUTZ_L_G, reg_readings, 2);
+    _read_registers(OUTZ_L_G, reg_readings, 2);
 
     uint16_t raw = (reg_readings[1] << 8) | reg_readings[0];
     int16_t res = static_cast<int16_t>(raw);

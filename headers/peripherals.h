@@ -3,6 +3,7 @@
 
 #include <cstdint>
 #include "hardware/spi.h"
+#include "headers/data.h"
 
 namespace peripherals {
     class EncoderReader {
@@ -28,9 +29,9 @@ namespace peripherals {
         uint8_t _cs_pin;
         bool gyro_enabled;
         int16_t offset_z;
-        uint8_t odr;
-        uint8_t dps;
-        uint32_t _baudrate;
+        imu_reg_t odr;
+        imu_reg_t dps;
+        uint32_t baudrate;
         void select();
         void deselect();
     
@@ -48,9 +49,9 @@ namespace peripherals {
         uint16_t get_refresh_rate();
         uint16_t get_sensivity();
         int16_t get_offset_z();
-        uint8_t _read_register(uint8_t reg);
-        void _write_register(uint8_t reg, uint8_t value);
-        void _read_registers(uint8_t reg, uint8_t* buffer, uint8_t n_bytes);
+        uint8_t _read_register(imu_reg_t reg);
+        void _write_register(imu_reg_t reg, uint8_t value);
+        void _read_registers(imu_reg_t reg, uint8_t* buffer, uint8_t n_bytes);
 
         uint8_t get_who_am_i();
         void enable_gyroscope();

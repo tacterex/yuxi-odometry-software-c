@@ -14,8 +14,8 @@ static void core1_task();
 struct shared_data
 {
     uint8_t buffer[3 * U_FLOAT_SIZE];
-    uint8_t w_regs[_i2c_slave_registers::_N_W_REGS];
-    uint8_t nw_regs[_i2c_slave_registers::_N_NW_REGS];
+    uint8_t w_regs[hardware::_i2c_n_w_regs];
+    uint8_t nw_regs[hardware::_i2c_n_nw_regs];
     bool updated;
 } calc_data, slave_data, cmn_data;
 
@@ -42,7 +42,7 @@ processes::I2CSlave slave(
     hardware::_i2c_i, 
     hardware::_i2c_sda, 
     hardware::_i2c_scl, 
-    _i2c_slave_registers::ADDRESS,
+    ADDRESS,
     hardware::_i2c_baudrate,
     slave_data.buffer, 
     slave_data.w_regs,
@@ -73,8 +73,8 @@ int main()
             calc_data.updated = true;
             slave_data.updated = false;
 
-            std::memcpy(calc_data.w_regs, slave_data.w_regs, _i2c_slave_registers::_N_W_REGS);
-            std::memcpy(calc_data.nw_regs, slave_data.nw_regs, _i2c_slave_registers::_N_NW_REGS);
+            std::memcpy(calc_data.w_regs, slave_data.w_regs, hardware::_i2c_n_w_regs);
+            std::memcpy(calc_data.nw_regs, slave_data.nw_regs, hardware::_i2c_n_nw_regs);
         }
 
         std::memcpy(slave_data.buffer, calc_data.buffer, 3 * U_FLOAT_SIZE);

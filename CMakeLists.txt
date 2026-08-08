@@ -38,6 +38,7 @@ pico_sdk_init()
 
 add_executable(ODOMETRY_SOFTWARE_C
  main.cpp
+ headers/data.cpp
  peripherals/EncoderReader.cpp
  peripherals/IMUReader.cpp
  peripherals/LedsManager.cpp
