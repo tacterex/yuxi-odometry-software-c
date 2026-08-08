@@ -21,7 +21,7 @@ int main()
     bool test_w_regs[3], test_nw_regs[1];
     bool test_sc = false;
 
-    processes::I2CSlave slave(0, 0, 1, _i2c_slave_registers::ADDRESS, hardware::_i2c_baudrate, test_w_regs, test_nw_regs, test_sc);
+    processes::I2CSlave slave(0, 0, 1, ADDRESS, _i2c_baudrate, test_w_regs, test_nw_regs, test_sc);
 
     slave.build();
 
