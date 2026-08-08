@@ -30,10 +30,10 @@ To assemble a complete odometry set consisting of the **Pinpoint Computer and tw
 * Male header pins
 * 3-pin and 4-pin male/female connectors (XH2.54 connectors are used in the example, but other suitable connectors may be used)
 * 1 × 4-pin JST-PH connector, or another connector compatible with the I2C master device
-* 1 × USB Type-C cable for flashing the firmware
 
 #### Tools and Supplies
 
+* 1 × USB Type-C cable for flashing the firmware
 * Soldering station
 * Solder and other supplies required for comfortable soldering
 
@@ -45,7 +45,7 @@ Once you have an **AS5600** breakout board (hereafter referred to as the **encod
 2. Using a short piece of wire, connect the ***DIR*** pin to ***GND***.
 3. Solder three identical wires, approximately **10–30 cm** long, to the ***VCC***, ***OUT***, and ***GND*** pins. Keep the solder joints as close to the breakout board as possible, with the wires facing toward the center of the board.
 4. Place the breakout board into the **3D-printed case** and secure it with screws. Route the wires through the dedicated hole in the case.
-5. Connect the wires to a **3-pin female connector**. The pinout used in the YUXI Odometry Set is ***VCC–OUT–GND*** when viewed from the top side of the connector. Make sure to use heat-shrink tubing to insulate and secure the connections.
+5. Connect the wires to a **3-pin female connector**. The pinout used in the example is ***VCC–OUT–GND*** when viewed from the top side of the connector. Make sure to use heat-shrink tubing to insulate and secure the connections.
 6. **Check all connections with a multimeter** before connecting the encoder to the rest of the system.
 
 ### Pinpoint Computer Assembly
