@@ -170,7 +170,7 @@ The YUXI Odometry firmware must be installed on the **Pimoroni Tiny 2350** befor
 The firmware build requires:
 
 * A computer with Git installed
-* Visual Studio Code
+* Visual Studio Code with Raspberry Pico plugin
 * Raspberry Pi Pico SDK and its required toolchain
 * The YUXI firmware repository
 * A USB Type-C cable
@@ -180,11 +180,9 @@ The firmware build requires:
 
 Clone or download the YUXI Odometry firmware repository and open the firmware directory in Visual Studio Code.
 
-Configure the project for the **Pimoroni Tiny 2350** board and generate the CMake build files.
+Make sure the project is configured for the **Pimoroni Tiny 2350** board and generate the CMake build files.
 
-Build the project using the configured Pico SDK environment.
-
-The build should produce a firmware `.uf2` file.
+Build the project using the `'Compile'` button in the window
 
 ### Flashing the firmware
 
@@ -192,25 +190,21 @@ The build should produce a firmware `.uf2` file.
 2. Connect the Tiny 2350 to the computer using USB.
 3. Enter the RP2350 bootloader mode according to the Pimoroni Tiny 2350 documentation.
 4. The board should appear as a USB mass-storage device.
-5. Copy the generated `.uf2` firmware file to the board.
+5. Click `'Run'`.
 6. Wait for the board to reboot automatically.
 7. Disconnect and reconnect the USB cable if necessary.
 
 After flashing, the firmware will start automatically.
 
-### Verifying the installation
+### Verifying the Installation
 
-Connect the YUXI Odometry Set to an I²C master and scan the I²C bus.
+After flashing the firmware, keep the **Pimoroni Tiny 2350 connected to the PC via USB**. There is no need to connect the YUXI Odometry Set to an I²C master at this stage.
 
-The device should appear at address:
+After the board reboots, observe the status LED and verify that it progresses through the normal startup sequence and eventually becomes **solid yellow**.
 
-```text
-0x69
-```
+A **solid yellow LED** indicates that the firmware has successfully started and completed its initialization process.
 
-The status LED should then progress through the normal startup sequence and eventually become **solid yellow**.
-
-If the device is not detected or the LED does not reach the normal-operation state, see the **Troubleshooting** section.
+If the LED does not reach the normal-operation state, or the board does not behave as expected after flashing, see the **Troubleshooting** section.
 
 ## Usage
 
