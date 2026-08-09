@@ -15,6 +15,64 @@ Keep in mind that the electronics assembly affects some aspects of the mechanica
 
 ### Table of Contents
 
+- [Assembly](#assembly)
+  - [Bill of Materials](#bill-of-materials)
+    - [Electronic Components](#electronic-components)
+    - [Tools and Supplies](#tools-and-supplies)
+  - [Encoder Assembly](#encoder-assembly)
+  - [Pinpoint Computer Assembly](#pinpoint-computer-assembly)
+  - [Placement on Robot](#placement-on-robot)
+
+- [Firmware Installation](#firmware-installation)
+  - [Requirements](#requirements)
+  - [Building the Firmware](#building-the-firmware)
+  - [Flashing the Firmware](#flashing-the-firmware)
+  - [Verifying the Installation](#verifying-the-installation)
+
+- [Usage](#usage)
+  - [Quick Start](#quick-start)
+  - [Overview](#overview)
+  - [Hardware Connection](#hardware-connection)
+  - [I²C Configuration](#i2c-configuration)
+  - [Register Map](#register-map)
+  - [Data Encoding](#data-encoding)
+  - [I²C Transactions](#i2c-transactions)
+    - [Reading Odometry Data](#reading-odometry-data)
+    - [Sending Commands](#sending-commands)
+  - [Initialization](#initialization)
+  - [LED Status Indicators](#led-status-indicators)
+    - [Sensor Startup](#sensor-startup)
+    - [RESET Command](#reset-command)
+    - [LED State Reference](#led-state-reference)
+  - [Technical Specifications](#technical-specifications)
+
+- [Firmware Structure](#firmware-structure)
+  - [Firmware Development](#firmware-development)
+  - [Modifying the Firmware](#modifying-the-firmware)
+    - [Hardware Configuration](#hardware-configuration)
+    - [I²C Configuration](#i2c-configuration-1)
+    - [SPI / IMU Configuration](#spi--imu-configuration)
+    - [Mechanical Configuration](#mechanical-configuration)
+    - [IMU Configuration](#imu-configuration)
+    - [I²C Slave Registers](#i2c-slave-registers)
+    - [What Should Usually Be Changed?](#what-should-usually-be-changed)
+
+- [MicroPython Examples](#micropython-examples)
+  - [Example Overview](#example-overview)
+  - [Requirements](#requirements-1)
+  - [Running the Examples](#running-the-examples)
+
+- [Recommended Integration Workflow](#recommended-integration-workflow)
+
+- [Troubleshooting](#troubleshooting)
+  - [Device is not detected on I²C](#device-is-not-detected-on-i2c)
+  - [Device is detected, but reading data times out](#device-is-detected-but-reading-data-times-out)
+  - [Odometry values are incorrect](#odometry-values-are-incorrect)
+  - [Heading is incorrect after reset](#heading-is-incorrect-after-reset)
+  - [Sensor does not reach solid yellow](#sensor-does-not-reach-solid-yellow)
+  - [Odometry scale is incorrect](#odometry-scale-is-incorrect)
+  - [Communication works but values are nonsensical](#communication-works-but-values-are-nonsensical)
+
 ## Assembly
 
 ### Bill of Materials
@@ -103,7 +161,143 @@ Connector 3: VCC - 0  - 1  - GND
 1. Position the **X and Y odometry pods** along perpendicular axes. Adjust their vertical positions to ensure good and consistent contact with the playing surface.
 2. Mount the **Pinpoint Computer** so that the **upper side of the perfboard**, where the **Tiny** and **IMU** are mounted, faces the **top of the robot**. This orientation is **critical for the proper operation of the system**.
 
+## Firmware Installation
+
+The YUXI Odometry firmware must be installed on the **Pimoroni Tiny 2350** before the Pinpoint Computer can be used.
+
+### Requirements
+
+The firmware build requires:
+
+* A computer with Git installed
+* Visual Studio Code
+* Raspberry Pi Pico SDK and its required toolchain
+* The YUXI firmware repository
+* A USB Type-C cable
+* A Pimoroni Tiny 2350
+
+### Building the firmware
+
+Clone or download the YUXI Odometry firmware repository and open the firmware directory in Visual Studio Code.
+
+Configure the project for the **Pimoroni Tiny 2350** board and generate the CMake build files.
+
+Build the project using the configured Pico SDK environment.
+
+The build should produce a firmware `.uf2` file.
+
+### Flashing the firmware
+
+1. Disconnect the Tiny 2350 from the robot.
+2. Connect the Tiny 2350 to the computer using USB.
+3. Enter the RP2350 bootloader mode according to the Pimoroni Tiny 2350 documentation.
+4. The board should appear as a USB mass-storage device.
+5. Copy the generated `.uf2` firmware file to the board.
+6. Wait for the board to reboot automatically.
+7. Disconnect and reconnect the USB cable if necessary.
+
+After flashing, the firmware will start automatically.
+
+### Verifying the installation
+
+Connect the YUXI Odometry Set to an I²C master and scan the I²C bus.
+
+The device should appear at address:
+
+```text
+0x69
+```
+
+The status LED should then progress through the normal startup sequence and eventually become **solid yellow**.
+
+If the device is not detected or the LED does not reach the normal-operation state, see the **Troubleshooting** section.
+
 ## Usage
+
+### Quick Start
+
+This section provides the shortest procedure for getting a fully assembled YUXI Odometry Set working.
+
+#### 1. Connect the sensor
+
+Connect the YUXI Odometry Set to the I²C master:
+
+```text
+YUXI        I²C Master
+
+VCC ------- 3V3
+SDA ------- SDA
+SCL ------- SCL
+GND ------- GND
+```
+
+The YUXI Odometry Set operates at **3.3 V**. Do not connect VCC to 5 V.
+
+#### 2. Verify the I²C connection
+
+Configure the master for:
+
+| Parameter   | Value     |
+| ----------- | --------- |
+| I²C address | `0x69`    |
+| I²C speed   | `100 kHz` |
+| Addressing  | `7-bit`   |
+
+Scan the I²C bus and verify that device `0x69` is detected.
+
+#### 3. Power on the YUXI system
+
+After powering the system, wait until the status LED becomes **solid yellow**.
+
+During the blue LED stage, keep the robot completely stationary because the IMU is being calibrated.
+
+#### 4. Reset the odometry
+
+After the I²C connection has been established, send the `RESET` command:
+
+```python
+ADDR = 0x69
+RESET = 0x33
+
+i2c.writeto(ADDR, bytes([RESET]))
+```
+
+Keep the robot stationary until the initialization and calibration process is complete.
+
+The `RESET` command establishes the current robot position and heading as the new `(0, 0, 0)` reference.
+
+#### 5. Read odometry data
+
+Request 12 bytes starting from register `0x45`:
+
+```python
+START_REGISTER = 0x45
+
+i2c.writeto(ADDR, bytes([START_REGISTER]))
+data = i2c.readfrom(ADDR, 12)
+```
+
+Decode the returned data as three little-endian `float32` values:
+
+```python
+import struct
+
+pos_x, pos_y, heading = struct.unpack("<fff", data)
+
+print(f"X: {pos_x:.2f} mm")
+print(f"Y: {pos_y:.2f} mm")
+print(f"Heading: {heading:.4f} rad")
+```
+
+The returned values are:
+
+```text
+POS_X   — X position in millimeters
+POS_Y   — Y position in millimeters
+HEADING — heading in radians
+```
+
+The system is now ready to be integrated into the robot control software.
 
 ### Overview
 
@@ -322,9 +516,9 @@ The three odometry values occupy **12 consecutive bytes**, starting from registe
 The corresponding register ranges are:
 
 ```text
-0x46 ───── 0x49    POS_X
-0x4A ───── 0x4D    POS_Y
-0x4E ───── 0x51    HEADING
+0x45 ───── 0x48    POS_X
+0x49 ───── 0x4C    POS_Y
+0x4D ───── 0x50    HEADING
 ```
 
 When reading all three values at once, the master should request **12 bytes starting from register `0x45`**.
@@ -563,12 +757,6 @@ The following parameters may be useful when integrating the YUXI Odometry Sensor
 | Encoder                | `AS5600` ×2          |
 | Head controller        | `Pimoroni Tiny 2350` |
 
-### Firmware Structure
-
-The YUXI Odometry firmware is organized into separate modules for data
-management, hardware peripherals, odometry processing, I²C communication,
-and testing.
-
 ## Firmware Structure
 
 The YUXI Odometry firmware is organized into separate modules for data management, hardware peripherals, odometry processing, I²C communication and testing. Firmware is written using PICO SDK
@@ -591,6 +779,22 @@ The YUXI Odometry firmware is organized into separate modules for data managemen
 | `CMakeLists.txt` | CMake build configuration |
 | `pico_sdk_import.cmake` | Raspberry Pi Pico SDK integration |
 | `README.md` | Project documentation |
+
+### Firmware Development
+
+The YUXI Odometry firmware is written in **C++** using the **Raspberry Pi Pico SDK** and is built using **CMake**.
+
+The firmware targets the **Pimoroni Tiny 2350 (RP2350)**.
+
+The project is organized so that hardware configuration and communication parameters can be modified independently from the main implementation. For most hardware customizations, the primary configuration file is:
+
+```text
+headers/data.h
+```
+
+See **Modifying the Firmware** for a description of the parameters that can safely be changed.
+
+When modifying the firmware, make sure that changes to the hardware configuration remain consistent with the physical wiring and that changes to the I²C protocol are reflected in the corresponding master-side software.
 
 ### Modifying the Firmware
 
@@ -753,3 +957,157 @@ Only standard MicroPython modules are used, so **no external libraries are requi
 Copy the required `.py` file from `examples/micropython/` to the MicroPython master device and execute it.
 
 The examples are intended to be used as a starting point for integration. They can be modified and combined with the user's robot-control code as required.
+
+### Recommended Integration Workflow
+
+When integrating YUXI into a robot control system, the following sequence is recommended:
+
+1. **Verify hardware**
+   Confirm the power, ground, SDA, and SCL connections.
+
+2. **Verify I²C communication**
+   Scan the bus and confirm that `0x69` is detected.
+
+3. **Test reset**
+   Send the `RESET` command and verify that the sensor completes calibration.
+
+4. **Test raw odometry output**
+   Read the 12-byte data block and decode the three `float32` values.
+
+5. **Verify stationary behavior**
+   With the robot stationary, confirm that the position and heading remain approximately constant.
+
+6. **Verify each axis independently**
+   Move the robot along the X and Y directions and confirm that the corresponding position changes as expected.
+
+7. **Verify heading**
+   Rotate the robot and confirm that the heading changes in the expected direction.
+
+8. **Integrate with the robot control system**
+   Once the sensor output has been verified independently, integrate the readings into the robot's localization or motion-control software.
+
+This approach separates hardware and communication problems from robot-control software problems and makes troubleshooting easier.
+
+## Troubleshooting
+
+This section lists the most common problems encountered when installing or integrating the YUXI Odometry Set.
+
+### Device is not detected on I²C
+
+If an I²C scan does not detect the YUXI device at `0x69`, check the following:
+
+1. Verify that the sensor is powered from **3.3 V**.
+2. Verify that **GND is connected** between the sensor and the I²C master.
+3. Check that SDA and SCL are connected to the correct pins.
+4. Verify that the master is using **7-bit address `0x69`**.
+5. Verify that the I²C bus is configured for **100 kHz**.
+6. Check all solder joints and connectors.
+7. Verify that the status LED reaches the normal-operation state.
+
+Do not continue troubleshooting the software protocol until the device is detected by an I²C scan.
+
+### Device is detected, but reading data times out
+
+If the device is detected but an I²C read fails or times out:
+
+1. Verify that the master first writes the starting register `0x45`.
+2. Verify that the master requests exactly **12 bytes** for a complete odometry reading.
+3. Check that the I²C bus speed is `100 kHz`.
+4. Check the SDA and SCL wiring.
+5. Verify that the sensor firmware is running normally and the status LED is solid yellow.
+
+A correct read transaction is:
+
+```text
+START
+  ↓
+SLAVE ADDRESS + WRITE
+  ↓
+0x45
+  ↓
+REPEATED START
+  ↓
+SLAVE ADDRESS + READ
+  ↓
+12 BYTES
+  ↓
+STOP
+```
+
+### Odometry values are incorrect
+
+If the device communicates correctly but the position or heading is incorrect:
+
+1. Verify that both odometry pods are mounted correctly.
+2. Verify that the X and Y pods are positioned along perpendicular axes.
+3. Check the orientation of the Pinpoint Computer.
+4. Verify the configured odometry wheel diameter.
+5. Execute `RESET` while the robot is stationary.
+6. Keep the robot completely stationary during IMU calibration.
+7. Check that the X encoder is connected to the configured X input and the Y encoder is connected to the configured Y input.
+
+### Heading is incorrect after reset
+
+If the heading is incorrect immediately after reset:
+
+1. Place the robot on a stable surface.
+2. Ensure that the robot does not move during IMU calibration.
+3. Execute `RESET` again.
+4. Wait until the status LED returns to solid yellow before moving the robot.
+
+Movement during calibration can result in an incorrect stationary reference.
+
+### Sensor does not reach solid yellow
+
+The normal startup sequence is:
+
+```text
+WHITE  →  BLUE  →  YELLOW BLINK  →  YELLOW SOLID
+```
+
+If the sensor remains in an earlier state, check:
+
+* Power supply
+* Tiny 2350 connections
+* IMU connections
+* Firmware installation
+* Firmware configuration in `data.h`
+
+If the problem persists, inspect the firmware serial/debug output if available.
+
+### Odometry scale is incorrect
+
+If the robot moves a known distance but the reported position has an incorrect scale, check:
+
+```cpp
+WHEEL_DIAMETER_MM
+```
+
+in `headers/data.h`.
+
+The configured value must correspond to the effective diameter of the odometry wheel used by the robot.
+
+### Communication works but values are nonsensical
+
+Verify that the received 12 bytes are decoded as:
+
+```text
+float32
+little-endian
+```
+
+using:
+
+```python
+struct.unpack("<fff", data)
+```
+
+The three values are ordered as:
+
+```text
+POS_X
+POS_Y
+HEADING
+```
+
+Do not interpret the returned bytes as integers.
