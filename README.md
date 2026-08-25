@@ -4,6 +4,7 @@
 
 * For **hardware documentation**, see the [YUXI Odometry Hardware repository](https://github.com/tacterex/yuxi-odometry-hardware).
 * For the **FTC SDK library**, see: **TBA**
+* For the **Legal FTC version**, see: **TBA**
 
 ## Short Description
 
